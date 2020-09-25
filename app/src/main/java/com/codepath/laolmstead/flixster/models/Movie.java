@@ -1,5 +1,7 @@
 package com.codepath.laolmstead.flixster.models;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,29 +11,38 @@ import java.util.List;
 
 public class Movie {
 
-    public static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed";
-
     String posterPath;
+    String backdropPath;
     String title;
     String overview;
+    String baseURL;
     String posterSize;
+    public static final String TAG = "Movie";
 
-    public Movie(JSONObject jsonObject) throws JSONException {
+    public Movie(JSONObject jsonObject, Size size) throws JSONException {
         posterPath = jsonObject.getString("poster_path");
+        backdropPath = jsonObject.getString("backdrop_path");
         title = jsonObject.getString("title");
         overview = jsonObject.getString("overview");
+        baseURL = size.getBaseURL();
+        posterSize = size.getPosterSize();
     }
 
-    public static List<Movie> fromJsonArray(JSONArray movieJsonArray) throws JSONException {
+    public static List<Movie> fromJsonArray(JSONArray movieJsonArray, Size size) throws JSONException {
         List<Movie> movies = new ArrayList<>();
         for (int i = 0; i < movieJsonArray.length(); i++) {
-            movies.add(new Movie(movieJsonArray.getJSONObject(i)));
+            movies.add(new Movie(movieJsonArray.getJSONObject(i), size));
         }
         return movies;
     }
 
     public String getPosterPath() {
-        return String.format("https://image.tmdb.org/t/p/w342/%s", posterPath);
+        Log.i(TAG, baseURL + posterSize + posterPath);
+        return baseURL + posterSize + posterPath;
+    }
+
+    public String getBackdropPath() {
+        return baseURL + posterSize + backdropPath;
     }
 
     public String getTitle() {
